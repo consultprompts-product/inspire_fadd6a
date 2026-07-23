@@ -1065,5 +1065,37 @@
     }
   });
 </script>
-</body>
+<script>
+(function () {
+  var form = document.getElementById('contact-form');
+  var submitBtn = document.getElementById('contact-submit');
+  if (!form) return;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (submitBtn) submitBtn.disabled = true;
+    var original = submitBtn ? submitBtn.textContent : '';
+    if (submitBtn) submitBtn.textContent = 'Sending...';
+    var data = Object.fromEntries(new FormData(form).entries());
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+      .then(function (res) { return res.ok ? res.json() : Promise.reject(); })
+      .then(function () {
+        form.reset();
+        alert('Thanks — we will be in touch soon.');
+      })
+      .catch(function () {
+        alert('Something went wrong — please try again.');
+      })
+      .finally(function () {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = original;
+        }
+      });
+  });
+})();
+</script></body>
 </html>
